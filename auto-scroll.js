@@ -49,7 +49,7 @@ autoScrollModule.directive('autoScroll', [function() {
 
             scope.$watch(attrs.autoScrollSpeed, function(value) {
                 stopScroll();
-                speed = parseInt(value);
+                speed = parseInt(value, 10);
             });
         }
     }
