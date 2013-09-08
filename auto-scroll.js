@@ -12,6 +12,7 @@ autoScrollModule.directive('autoScroll', [function() {
                 if (mode == true) {
                     $scope.autoScrollMode = true;
                 } else if (mode == false) {
+                    console.log('mode changing to ' + mode);
                     $scope.autoScrollMode = false;
                 }
             }
@@ -21,6 +22,7 @@ autoScrollModule.directive('autoScroll', [function() {
 
             function pageScroll() {
                 $('body').animate({ scrollTop: $('body').height() }, speed, 'linear', function() {
+                    console.log('changing the autoScrollMode');
                     scope.setAutoScrollMode(false);
                     if (!scrollBarIsAtBottom()) {
                         scope.setAutoScrollMode(true);
@@ -33,7 +35,7 @@ autoScrollModule.directive('autoScroll', [function() {
             }
             
             function scrollBarIsAtBottom() {
-                return $('body').scrollTop() == ($(document).height()-$(window).height());
+                return $('body').scrollTop() == ($(document).height()-$(window).height());;
             }
 
             scope.$watch(attrs.autoScrollMode, function(value) {
