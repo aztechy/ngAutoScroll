@@ -5,7 +5,7 @@ var autoScrollModule = angular.module('auto-scroll', []);
 autoScrollModule.directive('autoScroll', [function() {
     return {
         controller: function($scope) {
-            $scope.autoScrollSpeed = 1;
+            $scope.autoScrollSpeed = 10000;
             $scope.autoScrollMode = false;
 
             $scope.setAutoScrollMode = function(mode) {
@@ -21,13 +21,22 @@ autoScrollModule.directive('autoScroll', [function() {
             var speed;
 
             function pageScroll() {
-                $('body').animate({ scrollTop: $('body').height() }, speed, 'linear', function() {
-                    console.log('changing the autoScrollMode');
-                    scope.setAutoScrollMode(false);
-                    if (!scrollBarIsAtBottom()) {
-                        scope.setAutoScrollMode(true);
+                $('body').animate({ scrollTop: $('body').height() }, {
+                    duration: speed,
+                    easing: 'linear',
+                    step: function() {
+                        if (scrollBarIsAtBottom()) {
+                            scope.setAutoScrollMode(false);
+                        }
+                    }, 
+                    complete: function() {
+                        console.log('changing the autoScrollMode');
+                        scope.setAutoScrollMode(false);
+                        if (!scrollBarIsAtBottom()) {
+                            scope.setAutoScrollMode(true);
+                        }                        
                     }
-                });    
+                });
             }
 
             function stopScroll() {
