@@ -4,59 +4,70 @@ var autoScrollModule = angular.module('auto-scroll', []);
 
 autoScrollModule.directive('autoScroll', [function() {
     return {
-        controller: function($scope) {
-            $scope.autoScrollSpeed = 10000;
-            $scope.autoScrollMode = false;
+        restrict: 'E',
+        template: '<div>' +
+                    'Speed: <input type="text" ng-model="autoScrollSpeed" /> <hr/>' +
+                    'Mode: {{autoScrollMode}} <hr/>' +
+                    '<button ng-click="setAutoScrollMode(\'start\')">Start</button>' + 
+                    '<button ng-click="setAutoScrollMode(\'stop\')">Stop</button>' +
+                  '</div>',
+        controller: function($scope, $element, $attrs) {
+            $scope.autoScrollSpeed = 1000;
+            $scope.autoScrollMode = 'stop';
 
             $scope.setAutoScrollMode = function(mode) {
-                if (mode == true) {
-                    $scope.autoScrollMode = true;
-                } else if (mode == false) {
-                    console.log('mode changing to ' + mode);
-                    $scope.autoScrollMode = false;
-                }
+                $scope.autoScrollMode = mode;
             }
         }, 
         link: function(scope, element, attrs) {
             var speed;
 
-            function pageScroll() {
+            var pageScroll = function() {
                 $('body').animate({ scrollTop: $('body').height() }, {
                     duration: speed,
                     easing: 'linear',
                     step: function() {
                         if (scrollBarIsAtBottom()) {
-                            scope.setAutoScrollMode(false);
+                            scope.$apply(function() {
+                                scope.setAutoScrollMode('stop');
+                            });
                         }
                     }, 
                     complete: function() {
-                        console.log('changing the autoScrollMode');
-                        scope.setAutoScrollMode(false);
+                        scope.$apply(function() {
+                            scope.setAutoScrollMode('stop');                            
+                        });
+
                         if (!scrollBarIsAtBottom()) {
-                            scope.setAutoScrollMode(true);
+                            if (scope.autoScrollMode == 'stop') {
+                                scope.$apply(function() {
+                                    scope.setAutoScrollMode('start');                                    
+                                });
+                            }
                         }                        
                     }
                 });
             }
 
-            function stopScroll() {
+            var stopScroll = function() {
                 $('body').stop();
+                scope.setAutoScrollMode('stop');
             }
             
-            function scrollBarIsAtBottom() {
+            var scrollBarIsAtBottom = function() {
                 return $('body').scrollTop() == ($(document).height()-$(window).height());;
             }
 
-            scope.$watch(attrs.autoScrollMode, function(value) {
-                console.log('autoScrollMode was changed to ' + value);
-                if (value == true) {
+            scope.$watch(attrs.scrollMode, function(value) {
+                console.log('Scrollmode changed: ' + value);
+                if (value == 'start') {
                     pageScroll();
                 } else {
                     stopScroll();
                 }
             });
 
-            scope.$watch(attrs.autoScrollSpeed, function(value) {
+            scope.$watch(attrs.scrollSpeed, function(value) {
                 stopScroll();
                 speed = parseInt(value, 10);
             });
